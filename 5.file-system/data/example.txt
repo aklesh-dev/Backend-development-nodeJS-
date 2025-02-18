@@ -1,0 +1,2 @@
+Hello, creating a file in Node.js.
+This is a new line add in the file.
