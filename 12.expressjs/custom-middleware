@@ -1,0 +1,35 @@
+const express = require('express');
+const app = express();
+
+// Custom middleware to log request timestamps
+const requestTimeStampLogger = (req, res, next) => {
+  // Generate ISO format timestamp
+  const timeStamp = new Date().toISOString();
+  // Log request details
+  console.log(`${timeStamp} from ${req.method} to ${req.url}`);
+  // Proceed to next middleware/route handler
+  next();
+};
+
+// Register middleware for all routes
+app.use(requestTimeStampLogger);
+
+// Home route handler
+app.get('/home', (req, res) => {
+  res.send("Homepage")
+})
+
+// About route handler
+app.get('/about', (req, res) => {
+  res.send("Aboutpage")
+})
+
+// 404 Handler - catches all undefined routes
+app.use((req, res) => {
+  res.status(404).send("Page not found");
+})
+
+// Start server on port 3000
+app.listen(3000, () => {
+  console.log("Server running!")
+})
