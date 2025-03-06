@@ -45,8 +45,39 @@ async function runQueryExamples() {
     // const allUsers = await User.find();
     // console.log(allUsers);
 
-    const getUserActive = await User.find({isActive: true});
-    console.log("Active user:", getUserActive);
+    // const getUserActive = await User.find({isActive: true});
+    // console.log("Active user:", getUserActive);
+
+    // const getSingleUser = await User.findOne({name:'Izumi Yadav'})
+    // console.log(getSingleUser);
+
+    // const getLastCreatedUserById = await User.findById(newUser._id)
+    // console.log(getLastCreatedUserById);
+
+
+    // const selectedFields = await User.find().select('name email -_id'); // Exclude the _id field from the result
+    // console.log(selectedFields);
+
+    // const limitedUsers = await User.find().limit(5).skip(1); // Retrieve 5 users starting from the second user (skip the first one)
+    // console.log(limitedUsers);
+
+    // const sortedUsers = await User.find().sort({age: -1}); // Retrieve all users sorted by age in descending order
+    // console.log(sortedUsers);
+
+    // const countDocument = await User.countDocuments({isActive: true}); // Count the number of active users
+
+    // const deletedUser = await User.findByIdAndDelete(newUser._id);
+    // console.log("deleted user ->", deletedUser);
+
+    const updateUser = await User.findByIdAndUpdate(
+      newUser._id,
+      {
+        $set: { age: 100 },
+        $push: { tags: "updated" },
+      },
+      { new: true }
+    );
+    console.log("updated user", updateUser);
 
   } catch (error) {
     console.error("Error:", error);
