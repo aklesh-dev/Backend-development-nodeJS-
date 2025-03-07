@@ -1,0 +1,21 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "This a auth and authorization api with jwt",
+  "main": "server.js",
+  "scripts": {
+    "test": "\"start\": \"index.js\"",
+    "start": "server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "Aklesh Yadav",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.12.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
