@@ -43,16 +43,32 @@ const uploadImage = async (req, res) => {
   }
 };
 
-const fetchImages = async(req, res) => {
+const fetchImages = async (req, res) => {
   try {
-    const images = await Image.find();
-    if(images){
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    // Sorting
+    const sortBy = req.query.sortBy || 'createdAt';
+    const sortOrder = req.query.sortOrder || 'asc' ? 1 : -1;
+    const totalImages = await Image.countDocuments();
+    const totalPages = Math.ceil(totalImages / limit);
+
+    const sortObj = {};
+    sortObj[sortBy] = sortOrder;
+
+    const images = await Image.find().sort(sortObj).skip(skip).limit(limit);
+    if (images) {
       return res.status(200).json({
         success: true,
+        currentPage:page,
+        totalPages: totalPages,
+        totalImages: totalImages,
         data: images,
       });
     }
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -62,7 +78,7 @@ const fetchImages = async(req, res) => {
   }
 }
 
-const deleteImage = async (req, res) => { 
+const deleteImage = async (req, res) => {
   try {
     const getCurrentImageId = req.params.id;
     const userId = req.userInfo.userId; // taken from authMiddleware
@@ -88,20 +104,20 @@ const deleteImage = async (req, res) => {
 
     // Delete this image from the mongodb database
     await Image.findByIdAndDelete(getCurrentImageId);
-    
+
     return res.status(200).json({
       success: true,
       message: "Image deleted successfully",
     });
-    
+
   } catch (error) {
-    console.error("Error deleting image:",error);
+    console.error("Error deleting image:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong! Please try again later",
       error: error.message,
     })
   }
- }
+}
 
-module.exports = {uploadImage, fetchImages, deleteImage};
+module.exports = { uploadImage, fetchImages, deleteImage };
