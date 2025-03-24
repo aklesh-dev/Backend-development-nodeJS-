@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat app</title>
+  </head>
+  <body>
+    <div id="user-list">
+      <h3>Online Users</h3>
+      <ul id="online-users"></ul>
+    </div>
+
+    <div id="chat"></div>
+    <form id="message-form">
+      <input type="text" id="message" placeholder="Type a message" />
+      <button type="submit">Send</button>
+    </form>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      const socket = io(); // connect to the server
+      const chat = document.getElementById("chat"); // get the chat element
+      const usersList = document.getElementById("online-users"); // get the user list element
+      const messageForm = document.getElementById("message-form"); // get the message form element
+      const messageInput = document.getElementById("message"); // get the message input element
+
+      const userName = prompt("Enter your name:"); // get the user name from the user
+      socket.emit("join", userName); // Emit a 'join' event to the server with the user's name  || join the chat room
+
+      // Listen for 'joined' events from the server indicating that a new user has joined the chat
+      socket.on("joined", (user) => {
+        addMessage(`${user} has joined the chat`); // Add a message to the chat indicating the new user
+      });
+
+      // Listen for 'userLeft' events from the server indicating that a user has left the chat
+      socket.on("userLeft", (user) => {
+        addMessage(`${user} has left the chat.`);
+      });
+      
+      // Listen for 'userList' events from the server to update the list of online users
+      socket.on("userList", (users) => {
+        usersList.innerHTML = users.map((user) => `<li>${user}</li>`).join(" ");
+      });
+
+      // Listen for 'chatMessage' events from the server to handle incoming chat messages
+      socket.on("chatMessage", (message) => {
+        addMessage(`${message.userName}: ${message.text}`);
+      });
+
+      // *Handle form submission for sending chat messages
+      messageForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const extractMessageText = messageInput.value.trim(); // Get the trimmed value of the message input field
+
+        // Check if the message input is not empty
+        if (extractMessageText) {
+          // Emit a 'chatMessage' event to the server with the user's name and message text
+          socket.emit("chatMessage", {
+            userName,
+            text: extractMessageText,
+          });
+          messageInput.value = ""; // Clear the message input field after sending the message
+        }
+      });
+
+      // Function to add a message to the chat container
+      function addMessage(input) {
+        const messageElement = document.createElement("div"); // Create a new div element for the message
+        messageElement.textContent = input; // Set the text content of the message element to the input message
+        chat.appendChild(messageElement); // Append the message element to the chat container
+
+        // Scroll to the bottom of the chat container to show the latest message
+        chat.scrollTop = chat.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
